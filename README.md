@@ -1,0 +1,2 @@
+# WerwolfBot
+Bot für WWDiscord
