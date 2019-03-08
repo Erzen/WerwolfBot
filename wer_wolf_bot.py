@@ -31,10 +31,10 @@ class MyClient(discord.Client):
             await bot.say("World")
 
     async def on_member_join(self, member):
-        await bot.send_message(self.logChannel, "{} joined the Server!".format(member))
+        await bot.send_message(self.logChannel, "{} ({}) joined the Server!".format(member, member.name))
 
     async def on_member_remove(self, member):
-        await bot.send_message(self.logChannel, "{} left the Server!".format(member))
+        await bot.send_message(self.logChannel, "{} ({}) left the Server!".format(member, member.name))
 
     async def on_voice_state_update(self, before, after):
         if before.voice_channel and not after.voice_channel :
