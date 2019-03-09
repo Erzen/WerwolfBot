@@ -103,7 +103,15 @@ class ServerLog():
 
     # reaction cleared
     async def on_reaction_clear(self, message, reactions):
-        await self.log_event(message.author, " got all reaction to his message cleared")
+        await self.log_event(message.author, "got all reaction to his message cleared")
+
+    # user was banned
+    async def on_member_ban(self, member):
+        await self.log_event(member, "got banned")
+
+    # user was unbanned
+    async def on_member_unban(self, member):
+        await self.log_event(member, "got unbanned")
 
     # main log method with timestamp and user identification
     async def log_event(self, user, message):

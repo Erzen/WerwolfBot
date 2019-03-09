@@ -58,6 +58,10 @@ class MyClient(Client):
     async def on_reaction_remove(self, reaction, user):
         await self.serverLog.on_reaction_remove(reaction, user)
 
-    # user's message was cleared from all reactions
-    async def on_reaction_clear(self, message, reactions):
-        await self.serverLog.on_reaction_clear(message, reactions)
+    # user was banned
+    async def on_member_ban(self, member):
+        await self.serverLog.on_member_ban(member)
+
+    # user was unbanned
+    async def on_member_unban(self, member):
+        await self.serverLog.on_member_unban(member)
