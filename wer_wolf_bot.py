@@ -22,10 +22,7 @@ class MyClient(Client):
     # New Message
     async def on_message(self, message):
         print('Message from {0.author}: {0.content}'.format(message))
-        if message.author == self.user or \
-           (message.author.id != '411643310848081921' and #Fukano
-            message.author.id != '232838719818825728' and #Erzen
-            message.author.id != '267744603371733002'):   #Linn
+        if message.author == self.user:
             return
         await self.serverLog.on_message(message)
 

@@ -33,6 +33,10 @@ class ServerLog():
 
     # Commands
     async def on_message(self, message):
+        if (message.author.id != '411643310848081921' and #Fukano
+            message.author.id != '232838719818825728' and #Erzen
+            message.author.id != '267744603371733002'):   #Linn
+            return
         if message.content[:1] == "/":
             command = message.content[1:]
             if command == "setupChannel":
