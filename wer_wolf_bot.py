@@ -1,72 +1,66 @@
-import json
+from discord import Client, Game
 
-import discord
+from server_log import ServerLog
 
 
-class MyClient(discord.Client):
+class MyClient(Client):
+    __slots__ = [ 'logChannel' , 'serverLog']
 
-    __slots__ = [ 'logChannel' ]
+    def __init__(self, **options):
+        super(MyClient, self).__init__(**options)
+        self.logChannel = None
+        self.serverLog = ServerLog(self)
+        #self.max_messages = 5000 # 5000 is the default value
 
     # Bot Log-In
     async def on_ready(self):
         print('Logged on as {0}!'.format(self.user))
         print("The bot is ready!")
-        await bot.change_presence(game=discord.Game(name="Making a    bot"))
+        await self.change_presence(game=Game(name="Making a bot"))
+        await self.serverLog.on_ready()
 
     # New Message
     async def on_message(self, message):
         print('Message from {0.author}: {0.content}'.format(message))
-        if message.author == bot.user:
+        if message.author == self.user or \
+           (message.author.id != '411643310848081921' and #Fukano
+            message.author.id != '232838719818825728' and #Erzen
+            message.author.id != '267744603371733002'):   #Linn
             return
-
-        if message.content[:1] == "/":
-            command = message.content[1:]
-            if command == "setupChannel":
-                self.logChannel = message.channel
-                await bot.send_message(self.logChannel, "The Channel {} was setup!".format(self.logChannel.mention))
-            elif command == "testChannel":
-                if self.logChannel:
-                    await bot.send_message(self.logChannel, "Channel erfolgreich getestet!")
-                else:
-                    await bot.send_message(message.channel, "Channel test ist Fehlgeschlagen!")
-            else:
-                await bot.send_message(message.author, "private Bestätigung")
+        await self.serverLog.on_message(message)
 
     # User joined Server
     async def on_member_join(self, member):
-        if self.logChannel:
-            await bot.send_message(self.logChannel, "{0.mention} ({0.name}) joined the Server!".format(member))
+        await self.serverLog.on_member_join(member)
 
     # User left the Server
     async def on_member_remove(self, member):
-        if self.logChannel:
-            await bot.send_message(self.logChannel, "{0.mention} ({0.name}) left the Server!".format(member))
+        await self.serverLog.on_member_remove(member)
+
+    # User was updated
+    async def on_member_update(self, before, after):
+        await self.serverLog.on_member_update(before, after)
 
     # VoiceChannel and mute_state of User Changed
     async def on_voice_state_update(self, before, after):
-        if self.logChannel:
-            if before.voice_channel and not after.voice_channel :
-                await bot.send_message(self.logChannel, "{0.mention} ({0.name}) disconnected from {0.voice_channel.mention}".format(before))
-
-            elif not before.voice_channel and after.voice_channel:
-                await bot.send_message(self.logChannel, "{0.mention} ({0.name}) joined {0.voice_channel.mention}".format(after))
-
-            elif before.voice_channel and after.voice_channel and before.voice_channel != after.voice_channel:
-                await bot.send_message(self.logChannel, "{1.mention} ({1.name}) moved from {0.voice_channel.mention} to {1.voice_channel.mention}".format(before, after))
+        await self.serverLog.on_voice_state_update(before, after)
 
     # User's Message got deleted unknown by whom
     async def on_message_delete(self, message):
-        if self.logChannel:
-            await bot.send_message(self.logChannel, "{0.author.mention}'s ({0.author.name}) message '{0.content}' in {0.channel.mention} got deleted".format(message))
+        await self.serverLog.on_message_delete(message)
 
     # User edited a Message
     async def on_message_edit(self, before, after):
-        if self.logChannel:
-            await bot.send_message(self.logChannel, "{1.author.mention} ({1.author.name}) changed: '{0.content}' to '{1.content}' in {0.channel.mention}".format(before, after))
+        await self.serverLog.on_message_edit(before, after)
 
+    # user did react to something
+    async def on_reaction_add(self, reaction, user):
+        await self.serverLog.on_reaction_add(reaction, user)
 
+    # user removed reaction from something
+    async def on_reaction_remove(self, reaction, user):
+        await self.serverLog.on_reaction_remove(reaction, user)
 
-bot = MyClient()
-with open('./auth.json') as f:
-    fileContent = f.read()
-    bot.run(json.loads(fileContent)['token'])
+    # user's message was cleared from all reactions
+    async def on_reaction_clear(self, message, reactions):
+        await self.serverLog.on_reaction_clear(message, reactions)
