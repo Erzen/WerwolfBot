@@ -60,7 +60,6 @@ class ServerLog():
     # main log method with timestamp and user identification
     async def log_event(self, user, message):
         if self.log_channel:
-            print(user)
             await self.discord_client.send_message(self.log_channel, "`{0}`\n{1.mention} ({1}) {2}".format(datetime.datetime.utcnow(), user, message))
 
     # Called when a Member joins a Server.
