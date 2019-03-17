@@ -60,6 +60,7 @@ class ServerLog():
     # main log method with timestamp and user identification
     async def log_event(self, user, message):
         if self.log_channel:
+            print(user)
             await self.discord_client.send_message(self.log_channel, "`{0}`\n{1.mention} ({1}) {2}".format(datetime.datetime.utcnow(), user, message))
 
     # Called when a Member joins a Server.
@@ -150,7 +151,7 @@ class ServerLog():
     #     after – A Message of the current version of the message.
     async def on_message_edit(self, before, after):
         if before.content != after.content:
-            await self.log_event(after, "changed: '{0.content}' to '{1.content}' in {0.channel.mention}".format(before, after))
+            await self.log_event(after.author, "changed: '{0.content}' to '{1.content}' in {0.channel.mention}".format(before, after))
 
     # Called when a message has a reaction added to it. Similar to on_message_edit, if the message is not found in the Client.messages cache, then this event will not be called.
     #
