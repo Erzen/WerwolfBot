@@ -121,6 +121,7 @@ class MyClient(Client):
     # user – A User or Member of the user who added the reaction.
     async def on_reaction_add(self, reaction, user):
         await self.serverLog.on_reaction_add(reaction, user)
+        await self.werwolfBot.on_reaction_add(reaction, user)
 
     # Called when a message has a reaction removed from it. Similar to on_message_edit, if the message is not found in the Client.messages cache, then this event will not be called.
     #
@@ -133,6 +134,7 @@ class MyClient(Client):
     #   user – A User or Member of the user who removed the reaction.
     async def on_reaction_remove(self, reaction, user):
         await self.serverLog.on_reaction_remove(reaction, user)
+        await self.werwolfBot.on_reaction_remove(reaction, user)
 
     # Called when a message has all its reactions removed from it. Similar to on_message_edit, if the message is not found in the Client.messages cache, then this event will not be called.
     # Parameters:

@@ -60,7 +60,7 @@ class ServerLog():
     # main log method with timestamp and user identification
     async def log_event(self, user, message):
         if self.log_channel:
-            await self.discord_client.send_message(self.log_channel, "`{0}`\n{1.mention} ({1}) {2}".format(datetime.datetime.utcnow(), user, message))
+            await self.discord_client.send_message(self.log_channel, "`{0}`\n{1} ({2}) {3}".format(datetime.datetime.utcnow(), user.nick if user.nick else user.name, user, message))
 
     # Called when a Member joins a Server.
     # Parameters:	member – The Member that joined.
@@ -245,7 +245,7 @@ class ServerLog():
     async def on_server_emojis_update(self, before, after):
         return
 
-        #------------------------------Log-Specific Events--------------------------------------------------
+    #------------------------------Log-Specific Events--------------------------------------------------
 
     # Called when a Server is either created by the Client or when the Client joins a server.
     # Parameters:	server – The class:Server that was joined.
