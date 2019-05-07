@@ -88,18 +88,23 @@ class ServerLog():
     #     after – The Member that updated their profile with the updated info.
     async def on_member_update(self, before, after):
         if before.roles != after.roles:
-            await self.log_event(before, "roles changed from:\n{0}\n\nto:\n{1}".format(self.extract_role_names(before.roles), self.extract_role_names(after.roles)))
+            removed_roles = list(set(before.roles) - set(after.roles))
+            added_roles = list(set(after.roles) - set(before.roles))
+            if len(added_roles) > 0:
+                await self.log_event(before, "got role(s) **__{0}__** added".format(self.extract_role_names(added_roles)))
+            if len(removed_roles) > 0:
+                await self.log_event(before, "got role(s) **__{0}__** removed".format(self.extract_role_names(removed_roles)))
         if before.nick != after.nick:
             await self.log_event(before, "nickname changed from:\n{0}\n\nto:\n{1}".format(before.nick if before.nick else before.name, after.nick if after.nick else after.name))
 
     def extract_role_names(self, roles):
-        role_names = None
+        role_names = []
         for role in roles:
             roleName = role.name
             if roleName == "@everyone":
                 roleName = "@every_one"
-            role_names = "{}\n{}".format(role_names, roleName)
-        return role_names
+            role_names.append(roleName)
+        return ", ".join(role_names)
 
     # Called when a Member changes their voice state.
     #
