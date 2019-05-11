@@ -1,17 +1,19 @@
 import json
+import logging
 
 from discord import Client, Game
 
 from werwolf.game.wer_wolf_bot import WerwolfBot
 from werwolf.log.server_log import ServerLog
 
+logging.basicConfig(level=logging.ERROR)
+logger = logging.getLogger(__name__)
 
 class MyClient(Client):
-    __slots__ = [ 'logChannel' , 'serverLog', "werwolfBot"]
+    __slots__ = [ 'serverLog', "werwolfBot"]
 
     def __init__(self, **options):
         super(MyClient, self).__init__(**options)
-        self.logChannel = None
         self.serverLog = ServerLog(self)
         self.werwolfBot = WerwolfBot(self)
         #self.max_messages = 5000 # 5000 is the default value
@@ -28,7 +30,7 @@ class MyClient(Client):
     async def on_ready(self):
         print('Logged on as {0}!'.format(self.user))
         print("The bot is ready!")
-        await self.change_presence(game=Game(name="Making a bot"))
+        await self.change_presence(activity=Game(name="Werwölfe von Düsterwald"))
         await self.serverLog.on_ready()
         await self.werwolfBot.on_ready()
 
@@ -38,8 +40,15 @@ class MyClient(Client):
         print('Message from {0.author}: {0.content}'.format(message))
         if message.author == self.user:
             return
-        await self.serverLog.on_message(message)
-        await self.werwolfBot.on_message(message)
+        try:
+            await self.serverLog.on_message(message)
+        except Exception as e:
+            logger.exception(e)
+        try:
+            await self.werwolfBot.on_message(message)
+        except Exception as e:
+            logger.exception(e)
+
 
     # Called when a Member joins a Server.
     # Parameters:	member – The Member that joined.
@@ -81,8 +90,8 @@ class MyClient(Client):
     #
     # before – The Member whose voice state changed prior to the changes.
     # after – The Member whose voice state changed after the changes.
-    async def on_voice_state_update(self, before, after):
-        await self.serverLog.on_voice_state_update(before, after)
+    async def on_voice_state_update(self, member, before, after):
+        await self.serverLog.on_voice_state_update(member, before, after)
 
     # Called when a message is deleted. If the message is not found in the Client.messages cache, then these events will
     # not be called. This happens if the message is too old or the client is participating in high traffic servers.
@@ -120,8 +129,15 @@ class MyClient(Client):
     # reaction – A Reaction showing the current state of the reaction.
     # user – A User or Member of the user who added the reaction.
     async def on_reaction_add(self, reaction, user):
-        await self.serverLog.on_reaction_add(reaction, user)
-        await self.werwolfBot.on_reaction_add(reaction, user)
+        try:
+            await self.serverLog.on_reaction_add(reaction, user)
+        except Exception as e:
+            logger.exception(e)
+        try:
+            await self.werwolfBot.on_reaction_add(reaction, user)
+        except Exception as e:
+            logger.exception(e)
+
 
     # Called when a message has a reaction removed from it. Similar to on_message_edit, if the message is not found in the Client.messages cache, then this event will not be called.
     #
@@ -133,8 +149,14 @@ class MyClient(Client):
     #   reaction – A Reaction showing the current state of the reaction.
     #   user – A User or Member of the user who removed the reaction.
     async def on_reaction_remove(self, reaction, user):
-        await self.serverLog.on_reaction_remove(reaction, user)
-        await self.werwolfBot.on_reaction_remove(reaction, user)
+        try:
+            await self.serverLog.on_reaction_remove(reaction, user)
+        except Exception as e:
+            logger.exception(e)
+        try:
+            await self.werwolfBot.on_reaction_remove(reaction, user)
+        except Exception as e:
+            logger.exception(e)
 
     # Called when a message has all its reactions removed from it. Similar to on_message_edit, if the message is not found in the Client.messages cache, then this event will not be called.
     # Parameters:
@@ -148,8 +170,8 @@ class MyClient(Client):
     #
     # You can access the server that the member got banned from via Member.server.
     # Parameters:	member – The member that got banned.
-    async def on_member_ban(self, member):
-        await self.serverLog.on_member_ban(member)
+    async def on_member_ban(self, guild, member):
+        await self.serverLog.on_member_ban(guild, member)
 
     # Called when a User gets unbanned from a Server.
     # Parameters:
@@ -170,31 +192,31 @@ class MyClient(Client):
     #
     # before – The Server prior to being updated.
     # after – The Server after being updated.
-    async def on_server_update(self, before, after):
-        await self.serverLog.on_server_update(before, after)
+    async def on_guild_update(self, before, after):
+        await self.serverLog.on_guild_update(before, after)
 
 
     # Called when a Server creates a new Role.
     #
     # To get the server it belongs to, use Role.server.
     # Parameters:	role – The Role that was created.
-    async def on_server_role_create(self, role):
-        await self.serverLog.on_server_role_create(role)
+    async def on_guild_role_create(self, role):
+        await self.serverLog.on_guild_role_create(role)
 
     # Called when a Server deletes a new Role.
     #
     # To get the server it belongs to, use Role.server.
     # Parameters:	role – The Role that was deleted.
-    async def on_server_role_delete(self, role):
-        await self.serverLog.on_server_role_delete(role)
+    async def on_guild_role_delete(self, role):
+        await self.serverLog.on_guild_role_delete(role)
 
     # Called when a Role is changed server-wide.
     # Parameters:
     #
     # before – The Role that updated with the old info.
     # after – The Role that updated with the updated info.
-    async def on_server_role_update(self, before, after):
-        await self.serverLog.on_server_role_update(before, after)
+    async def on_guild_role_update(self, before, after):
+        await self.serverLog.on_guild_role_update(before, after)
 
 
     # Called when a Server adds or removes Emoji.
@@ -202,9 +224,15 @@ class MyClient(Client):
     #
     # before – A list of Emoji before the update.
     # after – A list of Emoji after the update.
-    async def on_server_emojis_update(self, before, after):
-        await self.serverLog.on_server_emojis_update(before, after)
+    async def on_guild_emojis_update(self, guild, before, after):
+        await self.serverLog.on_guild_emojis_update(guild, before, after)
 
 with open('./auth.json') as f:
     fileContent = f.read()
-    MyClient().run(json.loads(fileContent)['token'])
+    authDict = json.loads(fileContent)
+    MyClient().run(authDict['token'])
+
+# with open('./authFeco.json') as f:
+#     fileContent = f.read()
+#     authDict = json.loads(fileContent)
+#     MyClient().run(authDict["email"],authDict["password"], bot=False)

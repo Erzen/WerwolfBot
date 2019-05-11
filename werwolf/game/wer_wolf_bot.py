@@ -36,7 +36,11 @@ class WerwolfBot():
             arguments = list(filter(lambda a: a != '', arguments))
             command = arguments[0]
             arguments.remove(command)
-            if command == "createGame":
+            if command == "help":
+                await self.whisper_help(message, arguments)
+            if command == "createChat":
+                await self.create_chat(message, arguments)
+            elif command == "createGame":
                 await self.create_game(message, arguments)
             elif command == "join":
                 await self.join_game(message, arguments)
@@ -59,29 +63,45 @@ class WerwolfBot():
             elif command == "back":
                 await self.back(message, arguments)
             elif command == "pool":
-                self.create_pool(message, arguments)
+                await self.create_pool(message, arguments)
             elif command == "leader":
                 await self.change_game_leader(message, arguments)
+
+    async def whisper_help(self, message, arguments):
+        with open('./werwolf/game/help_menu') as f:
+            fileContent = f.read()
+            await message.author.send(fileContent)
 
     async def on_reaction_add(self, reaction, user):
         if reaction.message.author == self.discord_client.user and user != self.discord_client.user:
             game = self.get_game_with_message(reaction.message)
-            if game is not None:
+            if game:
                 if game.invite_emoji == reaction.emoji:
                     await game.add_player(user, None)
 
     async def on_reaction_remove(self, reaction, user):
         if reaction.message.author == self.discord_client.user and user != self.discord_client.user:
             game = self.get_game_with_message(reaction.message)
-            if game is not None:
+            if game:
                 if game.invite_emoji == reaction.emoji:
                     await game.remove_player(user)
+
+    async def create_chat(self, message, arguments):
+        game = self.get_game(message.author)
+        if game:
+            for role in game.pool_list:
+                if role == arguments[0]:
+                    get = 0
+        else:
+            await message.channel.send("Du hostest derzeit kein Spiel!")
+
+
 
     async def create_game(self, message, arguments):
         game = self.get_game(message.author)
         game_id = arguments[0]
         del arguments[0]
-        emojis = self.find_emojis(game_id, message.server)
+        emojis = self.find_emojis(game_id, message.guild)
         emoji = None if len(emojis) == 0 else emojis[0]
         game_id = str(emoji) if emoji else game_id
 
@@ -91,19 +111,19 @@ class WerwolfBot():
             if emoji is not None:
                 if text is None or text == '':
                     text = "Hallo @everyone es wurde ein Spiel geöffnet reacted auf diese Nachricht mit dem emoji {} um dabei zu sein!".format(emoji)
-                invite_message = await self.discord_client.send_message(message.channel, "{}".format(text))
-                await self.discord_client.add_reaction(invite_message, emoji)
-            self.games[game_id] = Game(game_id, message.author, emoji, invite_message, self.discord_client)
+                invite_message = await message.channel.send("{}".format(text))
+                await invite_message.add_reaction(emoji)
+            self.games[game_id] = Game(game_id, message.author, emoji, invite_message)
 
-            await self.discord_client.send_message(message.channel, "Spiel '{}' wurde erstellt.".format(game_id))
+            await message.channel.send("Spiel '{}' wurde erstellt.".format(game_id))
         else:
-            await self.discord_client.send_message(message.channel, "Du hostest bereits ein Spiel oder die GameId ist bereits in benutzung!")
+            await message.channel.send("Du hostest bereits ein Spiel oder die GameId ist bereits in benutzung!")
 
     def find_emojis(self, argument, server):
         found_emojis = []
         colon_emojis = re.findall(r'<:([a-zA-Z0-9_%&+-]+):([0-9]+)>', argument)
         for colon_emoji in colon_emojis:
-            found_emojis.append(Emoji(name=colon_emoji[0], id=colon_emoji[1], server=server, require_colons=True, managed=False))
+            found_emojis.append(Emoji(guild=server, state=None, data={"require_colons":True, "managed":False, "id": colon_emoji[1], "name":colon_emoji[0]}))
         return found_emojis
 
     def get_game(self, identifier):
@@ -128,45 +148,48 @@ class WerwolfBot():
 
     async def close(self, message, arguments):
         game = self.get_game(message.author)
-        for role in message.server.roles:
-            if role.name == 'Lebendig' or role.name == 'Tot':
-                for player in game.players:
-                    await self.discord_client.remove_roles(player.member, role)
+        if game:
+            for role in message.guild.roles:
+                if role.name == 'Lebendig' or role.name == 'Tot':
+                    for player in game.players:
+                        await player.member.remove_roles(role)
 
-        del self.games[game.game_id]
-        await self.discord_client.send_message(message.channel, "Das Spiel '{}' wurde beendet!".format(game.game_id))
-
+            del self.games[game.game_id]
+            await message.channel.send("Das Spiel '{}' wurde beendet!".format(game.game_id))
+        else:
+            await message.channel.send("Du hostest derzeit kein Spiel!")
 
     async def join_game(self, message, arguments):
         game_id = ' '.join(arguments)
         if game_id in self.games:
             await self.games[game_id].add_player(message.author, None)
         else:
-            await self.discord_client.send_message(message.channel, "Game existiert nicht!")
+            await message.channel.send("Game existiert nicht!")
 
     async def add_player(self, message, arguments):
         game = self.get_game(message.author)
-        if not game:
-            await self.discord_client.send_message(message.channel, "Du hostest derzeit kein Spiel!")
-            return
-        for mention in message.mentions:
-            await game.add_player(mention, message.channel)
+        if game:
+            for mention in message.mentions:
+                await game.add_player(mention, message.channel)
+        else:
+            await message.channel.send("Du hostest derzeit kein Spiel!")
 
     async def kill_player(self, message, arguments):
         game = self.get_game(message.author)
-        if not game:
-            await self.discord_client.send_message(message.channel, "Du hostest derzeit kein Spiel!")
-            return
-        for mention in message.mentions:
-            await game.kill_player(mention, message.channel)
+        if game:
+            for mention in message.mentions:
+                await game.kill_player(mention, message.channel)
+        else:
+            await message.channel.send("Du hostest derzeit kein Spiel!")
 
     async def revive_player(self, message, arguments):
         game = self.get_game(message.author)
-        if not game:
-            await self.discord_client.send_message(message.channel, "Du hostest derzeit kein Spiel!")
-            return
-        for mention in message.mentions:
-            await game.revive_player(mention, message.channel)
+        if game:
+            for mention in message.mentions:
+                await game.revive_player(mention, message.channel)
+        else:
+            await message.channel.send("Du hostest derzeit kein Spiel!")
+
 
     async def list_players(self, message, arguments):
         game = self.get_game(message.author)
@@ -174,10 +197,9 @@ class WerwolfBot():
             playerNames = []
             for player in game.players:
                 playerNames.append(player.member.nick if player.member.nick else player.member.name)
-            await self.discord_client.send_message(message.channel, "Mitspieler:\n{}".format('\n'.join(playerNames)))
-
+            await message.channel.send("Mitspieler:\n{}".format('\n'.join(playerNames)))
         else:
-            await self.discord_client.send_message(message.channel, "Du hostest kein Spiel")
+            await message.channel.send("Du hostest derzeit kein Spiel!")
 
     async def next(self, message, arguments):
         game = self.get_game(message.author)
@@ -191,34 +213,42 @@ class WerwolfBot():
 
     async def kick(self, message, arguments):
         game = self.get_game(message.author)
-        if not game:
-            await self.discord_client.send_message(message.channel, "Spiel existiert nicht")
-            return
-        for member in message.mentions:
-            await game.remove_player(member)
+        if game:
+            for member in message.mentions:
+                await game.remove_player(member)
+        else:
+            await message.channel.send("Spiel existiert nicht")
 
     async def leave_game(self, message, arguments):
         game_id = ' '.join(arguments)
         if game_id in self.games:
             await self.games[game_id].remove_player(message.author)
         else:
-            await self.discord_client.send_message(message.channel, "Game existiert nicht!")
+            await message.channel.send("Game existiert nicht!")
 
     async def change_game_leader(self, message, arguments):
         game = self.get_game(message.author)
-        for member in message.mentions:
-            game.host = member
-            break
+        if game:
+            for member in message.mentions:
+                game.host = member
+                break
+        else:
+            await message.channel.send("Game existiert nicht!")
 
-    def create_pool(self, message, arguments):
+    async def create_pool(self, message, arguments):
         game = self.get_game(message.author)
-        role_list = []
-        role_count = 1
-        for argument in arguments:
-            if argument.isdigit():
-                role_count = int(argument)
-            else:
-                for x in range(0, role_count):
-                    role_list.append(argument)
-                role_count = 1
-        game.set_pool(role_list)
+        if game:
+            role_list = []
+            role_count = 1
+            for argument in arguments:
+                if argument.isdigit():
+                    role_count = int(argument)
+                    if role_count > 20:
+                        role_count = 20
+                else:
+                    for x in range(0, role_count):
+                        role_list.append(argument)
+                    role_count = 1
+            game.set_pool(role_list)
+        else:
+            await message.channel.send("Game existiert nicht!")
