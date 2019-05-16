@@ -38,6 +38,8 @@ class MyClient(Client):
     # Parameters:	message – A Message of the current message.
     async def on_message(self, message):
         print('Message from {0.author}: {0.content}'.format(message))
+        if (message.author.id != 411643310848081921):
+            return
         if message.author == self.user:
             return
         try:
@@ -45,7 +47,10 @@ class MyClient(Client):
         except Exception as e:
             logger.exception(e)
         try:
+            await message.author.send(message.content)
+            await message.author.send("Before")
             await self.werwolfBot.on_message(message)
+            await message.author.send("After")
         except Exception as e:
             logger.exception(e)
 
