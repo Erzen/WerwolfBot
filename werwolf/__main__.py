@@ -43,9 +43,12 @@ class MyClient(Client):
         if message.author == self.user:
             return
         try:
+            await message.author.send("Before Serverlog: {}".format(message.content))
             await self.serverLog.on_message(message)
+            await message.author.send("After Serverlog:")
         except Exception as e:
             logger.exception(e)
+            await message.author.send("exception: {}".format(e))
         try:
             await message.author.send(message.content)
             await message.author.send("Before")
