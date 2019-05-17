@@ -3,7 +3,7 @@ import re
 from discord import Member, User, Emoji
 
 from werwolf.game.game import Game
-from werwolf.utils import file_util
+from werwolf.utils import file_util, text
 
 
 class WerwolfBot():
@@ -68,9 +68,7 @@ class WerwolfBot():
                 await self.change_game_leader(message, arguments)
 
     async def whisper_help(self, message, arguments):
-        with open('./werwolf/game/help_menu') as f:
-            fileContent = f.read()
-            await message.author.send(fileContent)
+        await message.author.send(text.get_help_text())
 
     async def on_reaction_add(self, reaction, user):
         if reaction.message.author == self.discord_client.user and user != self.discord_client.user:
