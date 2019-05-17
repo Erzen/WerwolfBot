@@ -36,7 +36,6 @@ class WerwolfBot():
             arguments = list(filter(lambda a: a != '', arguments))
             command = arguments[0]
             arguments.remove(command)
-            await message.author.send("command: {}".format(command))
             if command == "help":
                 await self.whisper_help(message, arguments)
             if command == "createChat":

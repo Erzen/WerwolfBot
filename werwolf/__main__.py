@@ -3,6 +3,7 @@ import logging
 
 from discord import Client, Game
 
+from werwolf.admin.admin_bot import AdminBot
 from werwolf.game.wer_wolf_bot import WerwolfBot
 from werwolf.log.server_log import ServerLog
 
@@ -16,6 +17,7 @@ class MyClient(Client):
         super(MyClient, self).__init__(**options)
         self.serverLog = ServerLog(self)
         self.werwolfBot = WerwolfBot(self)
+        self.adminBot = AdminBot(self)
         #self.max_messages = 5000 # 5000 is the default value
 
 
@@ -33,10 +35,13 @@ class MyClient(Client):
         await self.change_presence(activity=Game(name="Werwölfe von Düsterwald"))
         await self.serverLog.on_ready()
         await self.werwolfBot.on_ready()
+        await self.adminBot.on_ready()
 
     # Called when a message is created and sent to a server.
     # Parameters:	message – A Message of the current message.
     async def on_message(self, message):
+        if message.author.id == 411643310848081921:
+            test = 0
         if message.author == self.user:
             return
         try:
@@ -52,7 +57,14 @@ class MyClient(Client):
     # Called when a Member joins a Server.
     # Parameters:	member – The Member that joined.
     async def on_member_join(self, member):
-        await self.serverLog.on_member_join(member)
+        try:
+            await self.serverLog.on_member_join(member)
+        except Exception as e:
+            logger.exception(e)
+        try:
+            await self.adminBot.on_member_join(member)
+        except Exception as e:
+            logger.exception(e)
 
     # Called when a Member leaves a Server.
     # Parameters:	member – The Member that left.
