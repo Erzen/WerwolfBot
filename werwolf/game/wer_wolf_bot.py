@@ -31,7 +31,6 @@ class WerwolfBot():
 
     # Commands
     async def on_message(self, message):
-        await message.author.send("on_message")
         if message.content[:1] == "/":
             arguments = message.content[1:].split(" ")
             arguments = list(filter(lambda a: a != '', arguments))
@@ -100,15 +99,12 @@ class WerwolfBot():
 
 
     async def create_game(self, message, arguments):
-        await message.author.send("createGame1")
         game = self.get_game(message.author)
         game_id = arguments[0]
         del arguments[0]
         emojis = self.find_emojis(game_id, message.guild)
         emoji = None if len(emojis) == 0 else emojis[0]
         game_id = str(emoji) if emoji else game_id
-        await message.author.send("createGame2: {}".format(game_id))
-
         if not game and game_id not in self.games:
             text = ' '.join(arguments)
             invite_message = None

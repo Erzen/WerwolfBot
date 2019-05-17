@@ -37,23 +37,14 @@ class MyClient(Client):
     # Called when a message is created and sent to a server.
     # Parameters:	message – A Message of the current message.
     async def on_message(self, message):
-        print('Message from {0.author}: {0.content}'.format(message))
-        if (message.author.id != 411643310848081921):
-            return
         if message.author == self.user:
             return
         try:
-            await message.author.send("Before Serverlog: {}".format(message.content))
             await self.serverLog.on_message(message)
-            await message.author.send("After Serverlog:")
         except Exception as e:
             logger.exception(e)
-            await message.author.send("exception: {}".format(e))
         try:
-            await message.author.send(message.content)
-            await message.author.send("Before")
             await self.werwolfBot.on_message(message)
-            await message.author.send("After")
         except Exception as e:
             logger.exception(e)
 
