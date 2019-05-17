@@ -13,7 +13,7 @@ class AdminBot():
 
     # discord_client Log-In
     async def on_ready(self):
-        print("WerwolfBot ready")
+        print("AdminBot ready")
 
     # Called when a Member joins a Server.
     # Parameters:	member – The Member that joined.
