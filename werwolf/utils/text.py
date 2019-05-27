@@ -1,14 +1,8 @@
 def get_help_text():
     return "__**Commands für everyone**__\n\
 ```\n\
-/createGame [optionaler Spielname] | Emoji [optionale Message für den invite]\n\
+/createGame Emoji [optionale Message für den invite]\n\
 - erstellt Spiel\n\
-``````\n\
-/join  [optionaler Spielname]\n\
-- tritt Spiel bei\n\
-``````\n\
-/leave\n\
-- verlässt das Spiel\n\
 ```\n\
 __**Commands für Spielleitung**__\n\
 ```\n\
