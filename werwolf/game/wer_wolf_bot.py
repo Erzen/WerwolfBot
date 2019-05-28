@@ -42,8 +42,6 @@ class WerwolfBot():
                 await self.create_chat(message, arguments)
             elif command == "createGame":
                 await self.create_game(message, arguments)
-            elif command == "join":
-                await self.join_game(message, arguments)
             elif command == "addPlayer":
                 await self.add_player(message, arguments)
             elif command == "kill":
@@ -56,8 +54,6 @@ class WerwolfBot():
                 await self.close(message, arguments)
             elif command == "kick":
                 await self.kick(message, arguments)
-            elif command == "leave":
-                await self.leave_game(message, arguments)
             elif command == "next":
                 await self.next(message, arguments)
             elif command == "back":
@@ -102,17 +98,24 @@ class WerwolfBot():
         emojis = self.find_emojis(game_id, message.guild)
         emoji = None if len(emojis) == 0 else emojis[0]
         game_id = str(emoji) if emoji else game_id
+
         if not game and game_id not in self.games:
             text = ' '.join(arguments)
-            invite_message = None
+
+            mentioned_channel = None
+            for channel in message.channel_mentions:
+                mentioned_channel = channel
+                text = text.replace("{} ".format(mentioned_channel.mention), "").replace(" {}".format(mentioned_channel.mention), "").replace(mentioned_channel.mention, "")
+                break
             if emoji is not None:
                 if text is None or text == '':
                     text = "Hallo @everyone es wurde ein Spiel geöffnet reacted auf diese Nachricht mit dem emoji {} um dabei zu sein!".format(emoji)
-                invite_message = await message.channel.send("{}".format(text))
+                invite_message = await (message.channel if not mentioned_channel else mentioned_channel).send("{}".format(text))
                 await invite_message.add_reaction(emoji)
-            self.games[game_id] = Game(game_id, message.author, emoji, invite_message)
-
-            await message.channel.send("Spiel '{}' wurde erstellt.".format(game_id))
+                self.games[game_id] = Game(game_id, message.author, emoji, invite_message)
+                await message.channel.send("Spiel '{}' wurde erstellt.".format(game_id))
+            else:
+                await message.channel.send("Der erste Parameter nach dem Command muss ein Emoji sein")
         else:
             await message.channel.send("Du hostest bereits ein Spiel oder die GameId ist bereits in benutzung!")
 
@@ -213,6 +216,7 @@ class WerwolfBot():
         if game:
             for member in message.mentions:
                 await game.remove_player(member)
+                await message.channel.send("Der Spieler '{}' wurde vom Spiel '{}' gekickt.".format(member.nick if member.nick else member.name, game.invite_emoji))
         else:
             await message.channel.send("Spiel existiert nicht")
 

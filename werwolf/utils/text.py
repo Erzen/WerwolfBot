@@ -1,14 +1,8 @@
 def get_help_text():
     return "__**Commands für everyone**__\n\
 ```\n\
-/createGame [optionaler Spielname] | Emoji [optionale Message für den invite]\n\
+/createGame Emoji [optionale Message für den invite]\n\
 - erstellt Spiel\n\
-``````\n\
-/join  [optionaler Spielname]\n\
-- tritt Spiel bei\n\
-``````\n\
-/leave\n\
-- verlässt das Spiel\n\
 ```\n\
 __**Commands für Spielleitung**__\n\
 ```\n\
@@ -48,5 +42,5 @@ def get_greeting_text(member):
 Der Server Werwolf steht grundsätzlich für das Gesellschaftsspiel \"Werwölfe von Düsterwald\". \
 Wir spielen fast täglich auf dem Server. Neben Werwolf bieten wir noch andere Spiele, wie Secret Hitler\
 , Werwolf Vollmondnacht/Morgengrauen, skribbl.io usw. an. Diese sowie alles Weitere findest du links unter \
-\"Regeln und Infos\". Fühl dich wie zu Hause - bei Unklarheiten einfach fragen. Wir freuen uns, bald mit dir\
+ der Kategorie \"Wichtiges\". Fühl dich wie zu Hause - bei Unklarheiten einfach fragen. Wir freuen uns, bald mit dir\
  zu spielen! <:HappyTessa:490482340116561921>".format(member.nick if member.nick else member.name)
