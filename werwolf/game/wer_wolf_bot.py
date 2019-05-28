@@ -159,13 +159,6 @@ class WerwolfBot():
         else:
             await message.channel.send("Du hostest derzeit kein Spiel!")
 
-    async def join_game(self, message, arguments):
-        game_id = ' '.join(arguments)
-        if game_id in self.games:
-            await self.games[game_id].add_player(message.author, None)
-        else:
-            await message.channel.send("Game existiert nicht!")
-
     async def add_player(self, message, arguments):
         game = self.get_game(message.author)
         if game:
@@ -189,7 +182,6 @@ class WerwolfBot():
                 await game.revive_player(mention, message.channel)
         else:
             await message.channel.send("Du hostest derzeit kein Spiel!")
-
 
     async def list_players(self, message, arguments):
         game = self.get_game(message.author)
@@ -219,13 +211,6 @@ class WerwolfBot():
                 await message.channel.send("Der Spieler '{}' wurde vom Spiel '{}' gekickt.".format(member.nick if member.nick else member.name, game.invite_emoji))
         else:
             await message.channel.send("Spiel existiert nicht")
-
-    async def leave_game(self, message, arguments):
-        game_id = ' '.join(arguments)
-        if game_id in self.games:
-            await self.games[game_id].remove_player(message.author)
-        else:
-            await message.channel.send("Game existiert nicht!")
 
     async def change_game_leader(self, message, arguments):
         game = self.get_game(message.author)
