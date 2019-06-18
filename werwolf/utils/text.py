@@ -25,13 +25,16 @@ __**Commands für Spielleitung**__\n\
 - entfernt Spieler vom Spiel\n\
 ``````\n\
 /next\n\
-- Wechselt von Spielphase 'inviting' zu 'gaming' und verteilt Rollen\n\
+- Wechselt von Spielphase 'inviting' -> 'checking_roles' -> 'gaming' und verteilt Rollen bei 'gaming'\n\
 ``````\n\
 /back\n\
 - wechselt zurück zur Phase 'inviting'\n\
 ``````\n\
 /pool 3 db 3 ww hexe amor jäger\n\
 - erstellt einen Rollenpool der bei /next verteilt wird\n\
+``````\n\
+/shuffle\n\
+- Während der Spielphase 'checking_roles' kann die Rollenverteilung nochmal durchmischt werden\n\
 ``````\n\
 /leader @Spieler\n\
 - gibt die Spielleitung an @Spieler ab (noch buggy)\n\

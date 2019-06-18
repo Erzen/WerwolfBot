@@ -175,7 +175,7 @@ class ServerLog():
     #   reaction – A Reaction showing the current state of the reaction.
     #   user – A User or Member of the user who removed the reaction.
     async def on_reaction_remove(self, reaction, user):
-        await self.log_event(user, "removed the reaction {0.emoji} from __**{0.message.author}__**'s message".format(reaction))
+        await self.log_event(user, "removed the reaction {0.emoji} from __**{0.message.author}**__'s message".format(reaction))
 
     # Called when a message has all its reactions removed from it. Similar to on_message_edit, if the message is not found in the Client.messages cache, then this event will not be called.
     # Parameters:

@@ -62,6 +62,12 @@ class WerwolfBot():
                 await self.create_pool(message, arguments)
             elif command == "leader":
                 await self.change_game_leader(message, arguments)
+            elif command == "shuffle":
+                await self.shuffle(message, arguments)
+            #elif command == "vote":
+            #    await self.vote(message, arguments)
+            #elif command == "roleChat":
+            #    await self.role_chat(message, arguments)
 
     async def whisper_help(self, message, arguments):
         await message.author.send(text.get_help_text())
@@ -218,6 +224,14 @@ class WerwolfBot():
             for member in message.mentions:
                 game.host = member
                 break
+        else:
+            await message.channel.send("Game existiert nicht!")
+
+
+    async def shuffle(self, message, arguments):
+        game = self.get_game(message.author)
+        if game:
+            await game.shuffle()
         else:
             await message.channel.send("Game existiert nicht!")
 
