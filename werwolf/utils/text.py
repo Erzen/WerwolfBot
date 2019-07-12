@@ -45,6 +45,7 @@ def get_greeting_text(member):
 Der Server Werwolf steht grundsätzlich für das Gesellschaftsspiel \"Werwölfe von Düsterwald\". \
 Wir spielen fast täglich auf dem Server. Neben Werwolf bieten wir noch andere Spiele, wie Secret Hitler\
 , Werwolf Vollmondnacht/Morgengrauen, skribbl.io usw. an. Diese sowie alles Weitere findest du \
-auf unserem Discord. Um Berechtigungen für alle Channel auf dem Server zu erhalten, reagiere im Channel <#463009130777411584> \
-mit dem :white_check_mark:. Fühl dich wie zu Hause - bei Unklarheiten einfach fragen. Wir freuen uns, bald \
+auf unserem Discord. Um Berechtigungen für alle Channel auf dem Server zu erhalten, reagiere im Channel \
+<#463009130777411584> mit dem :white_check_mark:.\n\
+Fühl dich wie zu Hause - bei Unklarheiten einfach fragen. Wir freuen uns, bald \
 mit dir zu spielen! <:HappyTessa:490482340116561921>".format(member.nick if member.nick else member.name)
